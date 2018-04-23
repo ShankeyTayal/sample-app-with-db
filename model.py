@@ -6,28 +6,53 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+class Reservation(db.Model):
+    """Reservation in database - references Table and User objects."""
+
+    __tablename__ = "reservations"
+
+    reservation_id = db.Column(db.Integer, nullable=False, autoincrement=True,
+                               primary_key=True)
+    date = db.Column(db.String, nullable=False)
+    time = db.Column(db.String, nullable=False)
+    people_in_party = db.Column(db.Integer, nullable=False)
+    table_id = db.Column(db.Integer, db.ForeignKey("tables.table_id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    tables = db.relationship("Table", backref="reservation")
+    users = db.relationship("User", backref="reservation")
+
+
+class Table(db.Model):
+    """Table in database that can hold a max of 4 people."""
+
+    __tablename__ = "tables"
+
+    table_id = db.Column(db.Integer, nullable=False, autoincrement=True,
+                         primary_key=True)
+    people_count = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        """Human readable output to print object information."""
+
+        return "<Table table_id{}, people_count{}>".format(self.table_id,
+                                                           self.people_count)
+
+
 class User(db.Model):
-    """User of web app."""
+    """User of reservation app that can create Reservation."""
 
     __tablename__ = "users"
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    username = db.Column(db.String(30), nullable=False)
-    email = db.Column(db.String(64), nullable=False)
-    password = db.Column(db.String(15), nullable=False)
-
-    def __repr__(self):
-        """Provide human readable representation of User object when printed."""
-
-        return "<User user_id {}, username {}>".format(self.user_id,
-                                                       self.username)
+    user_id = db.Column(db.Integer, nullable=False, autoincrement=True,
+                        primary_key=True)
+    username = db.Column(db.String(20), nullable=False)
 
 
 def connect_to_db(app):
     """Function for connecting to Postgres database to create tables."""
 
-    # fill in * section with name of database
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///*"
+    # fill in database parameter with name of database
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///reservations"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)

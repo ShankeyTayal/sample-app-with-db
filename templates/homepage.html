@@ -3,12 +3,25 @@
 
   <link href="/static/style.css" rel="stylesheet">
 
-  <title>Hello World</title>
+  <title>Fancy Restaurant</title>
   
 </head>
 <body>
 
-  <h1>Hello World!</h1>
+  {% for message in get_flashed_messages() %}
+    <li>{{ message }}</li>
+  {% endfor %}
+
+  <h1>Fancy Restaurant</h1>
+  <h3>Reserve a table</h3>
+
+  <form action="/check-availability" method="POST">
+    Choose a username<input type="text" name="username"><br>
+    How many people are in your party?<input type="text" name="num_people"><br>
+    Choose a date for your reservation<input type="text" name="date"><br>
+    Choose a time for your reservation<input type="text" name="time"><br>
+    <input type="submit" value="Submit">
+  </form>
 
 </body>
 </html>
